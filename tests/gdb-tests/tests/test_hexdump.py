@@ -104,6 +104,7 @@ def test_hexdump_saved_address_and_offset(start_binary):
     assert pwndbg.commands.hexdump.hexdump.last_address == sp + SIZE
     assert pwndbg.commands.hexdump.hexdump.offset == SIZE
 
+
 def test_hexdump_large_count_handling(start_binary):
     start_binary(BINARY)
     sp = pwndbg.aglib.regs.sp
@@ -120,4 +121,4 @@ def test_hexdump_large_count_handling(start_binary):
         )  # Check that the result starts with correct address
     except gdb.error as e:
         # Ensure it raises an expected error or gracefully handles large counts
-        assert "cannot allocate" in str(e), f"Unexpected error: {e}"
+        assert "Request size too large" in str(e), f"Unexpected error: {e}"
