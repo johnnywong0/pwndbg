@@ -103,3 +103,21 @@ def test_hexdump_saved_address_and_offset(start_binary):
     assert out1 == out2
     assert pwndbg.commands.hexdump.hexdump.last_address == sp + SIZE
     assert pwndbg.commands.hexdump.hexdump.offset == SIZE
+
+def test_hexdump_large_count_handling(start_binary):
+    start_binary(BINARY)
+    sp = pwndbg.aglib.regs.rsp
+
+    # Test with a large count value that could lead to OOM
+    large_count = 2**31
+
+    # Ensure the hexdump doesn't crash
+    try:
+        result = gdb.execute(f"hexdump $rsp {large_count}", to_string=True)
+        # Optionally assert that the result is reasonable
+        assert result.startswith(
+            f"+0000 0x{sp:x}"
+        )  # Check that the result starts with correct address
+    except gdb.error as e:
+        # Ensure it raises an expected error or gracefully handles large counts
+        assert "cannot allocate" in str(e), f"Unexpected error: {e}"
