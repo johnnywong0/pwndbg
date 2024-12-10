@@ -16,6 +16,7 @@ GdbDict = Dict[str, Union["GdbDict", int]]
 
 
 MMAP_MIN_ADDR = 0x8000
+MAX_HEXDUMP_SIZE = 1 * 1024 * 1024 * 1024  # 1 GB
 
 
 def read(addr: int, count: int, partial: bool = False) -> bytearray:
@@ -32,6 +33,10 @@ def read(addr: int, count: int, partial: bool = False) -> bytearray:
         :class:`bytearray`: The memory at the specified address,
         or ``None``.
     """
+    if count > MAX_HEXDUMP_SIZE:
+        raise ValueError(
+            f"Request size too large: {count} bytes, max allowed is {MAX_HEXDUMP_SIZE} bytes"
+        )
     return pwndbg.dbg.selected_inferior().read_memory(address=addr, size=count, partial=partial)
 
 
