@@ -106,7 +106,7 @@ def test_hexdump_saved_address_and_offset(start_binary):
 
 def test_hexdump_large_count_handling(start_binary):
     start_binary(BINARY)
-    sp = pwndbg.aglib.regs.rsp
+    sp = pwndbg.aglib.regs.sp
 
     # Test with a large count value that could lead to OOM
     large_count = 2**31
