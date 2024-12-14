@@ -20,6 +20,8 @@ from pwndbg.commands.windbg import enhex
 color_scheme = None
 printable = None
 
+MAX_HEXDUMP_SIZE = 5 * 1024 * 1024
+
 
 def groupby(width: int, array, fill=None):
     return pwnlib.util.lists.group(width, array, underfull_action="fill", fill_value=fill)
@@ -83,6 +85,20 @@ def hexdump(
     repeat: bool = False,
     dX_call: bool = False,
 ):
+    # Check for invalid address
+    if not pwndbg.aglib.memory.peek(address):
+        print(H.error(f"Invalid address: {address:#x}"))
+        return
+
+    # Validate maximum size
+    if count > MAX_HEXDUMP_SIZE:
+        print(
+            H.error(
+                f"Request size too large: {count} bytes (max allowed is {MAX_HEXDUMP_SIZE} bytes)"
+            )
+        )
+        return
+
     if not dX_call:
         if not color_scheme or not printable:
             load_color_scheme()
